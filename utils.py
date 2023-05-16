@@ -5,7 +5,7 @@ import random
 from glob import glob
 
 
-def get_noise(dist: str, n_samples: int, length: int) -> None:
+def get_noise(dist: str, n_samples: int, length: int):
     """
     Generate noise samples according to the specified distribution.
 
