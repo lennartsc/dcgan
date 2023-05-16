@@ -45,7 +45,7 @@ def train_dcgan():
         evaluation_interval=config.EVALUATION_INTERVAL,
         n_epochs_critic=config.CRITIC_TRAIN_EPOCHS,
         disc_critic_loss_mean=config.DISC_CRITIC_LOSS_MEAN,
-        rotated_train=config.ROTATED_TRAIN
+        rotated_train=config.ROTATED_TRAIN,
     )
 
 

@@ -5,7 +5,7 @@ import random
 from glob import glob
 
 
-def get_noise(dist, n_samples, length):
+def get_noise(dist: str, n_samples: int, length: int) -> None:
     """
     Generate noise samples according to the specified distribution.
 
@@ -25,7 +25,9 @@ def get_noise(dist, n_samples, length):
     elif dist == "uniform":
         return np.random.uniform(0, 1, (n_samples, 1, 1, length))
     else:
-        raise ValueError("Invalid distribution. Supported options are 'gaussian' and 'uniform'.")
+        raise ValueError(
+            "Invalid distribution. Supported options are 'gaussian' and 'uniform'."
+        )
 
 
 def rescale_pixel_values(arr):
@@ -40,21 +42,25 @@ def rescale_pixel_values(arr):
     """
     for img in range(arr.shape[0]):
         # Rescale to [0,1].
-        arr[img, :, :] = arr[img, :, :] - np.amin(
-            arr[img, :, :])
+        arr[img, :, :] = arr[img, :, :] - np.amin(arr[img, :, :])
         if np.amax(arr[img, :, :]) < 1:
-            arr[img, :, :] = arr[img, :, :] * (
-                    1 / np.amax(arr[img, :, :]))
+            arr[img, :, :] = arr[img, :, :] * (1 / np.amax(arr[img, :, :]))
         elif np.amax(arr[img, :, :]) > 1:
-            arr[img, :, :] = arr[img, :, :] / np.amax(
-                arr[img, :, :])
+            arr[img, :, :] = arr[img, :, :] / np.amax(arr[img, :, :])
         # Rescale to [-1,1].
         arr[img, :, :] = (arr[img, :, :] * 2) - 1
 
     return arr
 
 
-def load_data(data_dir, data_type, batch_size, one_batch=True, rescale_imgs=True, rotated_train=None):
+def load_data(
+    data_dir,
+    data_type,
+    batch_size,
+    one_batch=True,
+    rescale_imgs=True,
+    rotated_train=None,
+):
     """
     Loads and returns image data from the specified directory.
 
@@ -140,7 +146,6 @@ def compute_total_loss(loss_target, loss_fake, mean=True):
         return (loss_target + loss_fake) / 2
 
 
-
 def write_logs_to_file(dict_losses, res_dir, filename):
     """
     Writes a dictionary of losses to a file.
@@ -158,7 +163,5 @@ def write_logs_to_file(dict_losses, res_dir, filename):
     if not os.path.exists(res_dir):
         os.makedirs(res_dir)
     pickle.dump(
-        dict_losses,
-        open(f"{res_dir}/{filename}.pkl", 'wb'),
-        pickle.HIGHEST_PROTOCOL
+        dict_losses, open(f"{res_dir}/{filename}.pkl", "wb"), pickle.HIGHEST_PROTOCOL
     )

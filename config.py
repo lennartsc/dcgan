@@ -51,7 +51,7 @@ The interval at which to perform evaluation during training.
 """
 
 # Across models
-INIT_WEIGHTS = RandomNormal(0., 0.02)
+INIT_WEIGHTS = RandomNormal(0.0, 0.02)
 """
 The initializer for the weights of the model layers.
 """
@@ -83,17 +83,52 @@ Specifies whether to use minibatch discrimination in the discriminator.
 """
 
 DISC_LAYER_STACK = [
-    Conv2D(32, kernel_size=3, strides=2, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    Dropout(DROPOUT_RATE), LeakyReLU(LEAKY_RELU_ALPHA),
-    Conv2D(64, kernel_size=3, strides=2, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    BatchNormalization(momentum=BATCHNORM_MOMENTUM), Dropout(DROPOUT_RATE), LeakyReLU(LEAKY_RELU_ALPHA),
-    Conv2D(128, kernel_size=3, strides=2, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    BatchNormalization(momentum=BATCHNORM_MOMENTUM), Dropout(DROPOUT_RATE), LeakyReLU(LEAKY_RELU_ALPHA),
-    Conv2D(256, kernel_size=3, strides=2, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    BatchNormalization(momentum=BATCHNORM_MOMENTUM), Dropout(DROPOUT_RATE), LeakyReLU(LEAKY_RELU_ALPHA),
+    Conv2D(
+        32,
+        kernel_size=3,
+        strides=2,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    Dropout(DROPOUT_RATE),
+    LeakyReLU(LEAKY_RELU_ALPHA),
+    Conv2D(
+        64,
+        kernel_size=3,
+        strides=2,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    BatchNormalization(momentum=BATCHNORM_MOMENTUM),
+    Dropout(DROPOUT_RATE),
+    LeakyReLU(LEAKY_RELU_ALPHA),
+    Conv2D(
+        128,
+        kernel_size=3,
+        strides=2,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    BatchNormalization(momentum=BATCHNORM_MOMENTUM),
+    Dropout(DROPOUT_RATE),
+    LeakyReLU(LEAKY_RELU_ALPHA),
+    Conv2D(
+        256,
+        kernel_size=3,
+        strides=2,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    BatchNormalization(momentum=BATCHNORM_MOMENTUM),
+    Dropout(DROPOUT_RATE),
+    LeakyReLU(LEAKY_RELU_ALPHA),
     Flatten(),
     Dense(1),
-    Activation('sigmoid')
+    Activation("sigmoid"),
 ]
 if MINIBATCH_DISCRIMINATION:
     DISC_LAYER_STACK.insert(-3, MinibatchDiscrimination(100, 5))
@@ -116,13 +151,39 @@ GEN_LAYER_STACK = [
     Dense(128 * 32 * 32, activation="relu", input_dim=100),
     Reshape((32, 32, 128)),
     UpSampling2D(),
-    Conv2D(128, kernel_size=3, strides=1, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    BatchNormalization(momentum=BATCHNORM_MOMENTUM), Dropout(DROPOUT_RATE), Activation('relu'),
+    Conv2D(
+        128,
+        kernel_size=3,
+        strides=1,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    BatchNormalization(momentum=BATCHNORM_MOMENTUM),
+    Dropout(DROPOUT_RATE),
+    Activation("relu"),
     UpSampling2D(),
-    Conv2D(64, kernel_size=3, strides=1, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    BatchNormalization(momentum=BATCHNORM_MOMENTUM), Dropout(DROPOUT_RATE), Activation('relu'),
-    Conv2D(1, kernel_size=3, strides=1, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    Activation('tanh')]
+    Conv2D(
+        64,
+        kernel_size=3,
+        strides=1,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    BatchNormalization(momentum=BATCHNORM_MOMENTUM),
+    Dropout(DROPOUT_RATE),
+    Activation("relu"),
+    Conv2D(
+        1,
+        kernel_size=3,
+        strides=1,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    Activation("tanh"),
+]
 """
 The layer stack configuration for the generator model.
 """
@@ -149,17 +210,52 @@ The length of the noise input to the generator model.
 
 # Critic
 CRITIC_LAYER_STACK = [
-    Conv2D(32,  kernel_size=3, strides=2, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    Dropout(DROPOUT_RATE), LeakyReLU(LEAKY_RELU_ALPHA),
-    Conv2D(64,  kernel_size=3, strides=2, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    BatchNormalization(momentum=BATCHNORM_MOMENTUM), Dropout(DROPOUT_RATE), LeakyReLU(LEAKY_RELU_ALPHA),
-    Conv2D(128, kernel_size=3, strides=2, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    BatchNormalization(momentum=BATCHNORM_MOMENTUM), Dropout(DROPOUT_RATE), LeakyReLU(LEAKY_RELU_ALPHA),
-    Conv2D(256, kernel_size=3, strides=2, padding="same", kernel_initializer=INIT_WEIGHTS, use_bias=BIAS),
-    BatchNormalization(momentum=BATCHNORM_MOMENTUM), Dropout(DROPOUT_RATE), LeakyReLU(LEAKY_RELU_ALPHA),
+    Conv2D(
+        32,
+        kernel_size=3,
+        strides=2,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    Dropout(DROPOUT_RATE),
+    LeakyReLU(LEAKY_RELU_ALPHA),
+    Conv2D(
+        64,
+        kernel_size=3,
+        strides=2,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    BatchNormalization(momentum=BATCHNORM_MOMENTUM),
+    Dropout(DROPOUT_RATE),
+    LeakyReLU(LEAKY_RELU_ALPHA),
+    Conv2D(
+        128,
+        kernel_size=3,
+        strides=2,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    BatchNormalization(momentum=BATCHNORM_MOMENTUM),
+    Dropout(DROPOUT_RATE),
+    LeakyReLU(LEAKY_RELU_ALPHA),
+    Conv2D(
+        256,
+        kernel_size=3,
+        strides=2,
+        padding="same",
+        kernel_initializer=INIT_WEIGHTS,
+        use_bias=BIAS,
+    ),
+    BatchNormalization(momentum=BATCHNORM_MOMENTUM),
+    Dropout(DROPOUT_RATE),
+    LeakyReLU(LEAKY_RELU_ALPHA),
     Flatten(),
     Dense(1),
-    Activation('sigmoid')
+    Activation("sigmoid"),
 ]
 """
 The layer stack configuration for the critic model.

@@ -1,7 +1,13 @@
 from Critic import Critic
 from keras.layers import Input
 from keras.models import Model
-from utils import load_data, get_noise, rescale_pixel_values, compute_total_loss, write_logs_to_file
+from utils import (
+    load_data,
+    get_noise,
+    rescale_pixel_values,
+    compute_total_loss,
+    write_logs_to_file,
+)
 import numpy as np
 import datetime
 
@@ -11,12 +17,25 @@ class DcGan:
     Class representing a Deep Convolutional Generative Adversarial Network (DCGAN).
     """
 
-    def __init__(self,
-                 img_shape, init_weights, noise_dist, noise_length, rescale_imgs, results_dir, data_dir,
-                 disc_layer_stack, disc_loss_func, disc_optimizer,
-                 gen_layer_stack, gen_loss_func, gen_optimizer,
-                 critic_layer_stack, critic_loss_func, critic_optimizer
-                 ):
+    def __init__(
+        self,
+        img_shape,
+        init_weights,
+        noise_dist,
+        noise_length,
+        rescale_imgs,
+        results_dir,
+        data_dir,
+        disc_layer_stack,
+        disc_loss_func,
+        disc_optimizer,
+        gen_layer_stack,
+        gen_loss_func,
+        gen_optimizer,
+        critic_layer_stack,
+        critic_loss_func,
+        critic_optimizer,
+    ):
         """
         Initialize the GAN with defined image shape, initial weights, noise distribution, noise length,
         decision about rescaling the images, results directory, data directory, and specifications for the discriminator,
@@ -50,11 +69,16 @@ class DcGan:
             layer_stack=critic_layer_stack,
             initial_weights=self.init_weights,
             loss_func=critic_loss_func,
-            optimizer=critic_optimizer
+            optimizer=critic_optimizer,
         )
 
         # Initialize dictionaries for evaluation.
-        self.val_losses = {"epoch": [], "target loss": [], "fake loss": [], "total loss": []}
+        self.val_losses = {
+            "epoch": [],
+            "target loss": [],
+            "fake loss": [],
+            "total loss": [],
+        }
 
     def _build_discriminator(self, disc_layer_stack):
         """
@@ -98,7 +122,9 @@ class DcGan:
             fake_img = layer(fake_img)
         return Model(inputs=noise, outputs=fake_img)
 
-    def _evaluate_generator(self, gan_train_epoch, batch_size, critic_train_epochs, disc_critic_loss_mean):
+    def _evaluate_generator(
+        self, gan_train_epoch, batch_size, critic_train_epochs, disc_critic_loss_mean
+    ):
         """
         Evaluates the generator's performance. The evaluation is done by training the critic from scratch using
         the training data and then using the trained critic to evaluate the generator's performance against validation data.
@@ -129,7 +155,7 @@ class DcGan:
             data_dir=self.data_dir,
             gan_epoch=gan_train_epoch,
             loss_mean=disc_critic_loss_mean,
-            rescale_imgs=self.rescale_imgs
+            rescale_imgs=self.rescale_imgs,
         )
 
         # Evaluate fixed generator using trained critic and validation data.
@@ -139,12 +165,12 @@ class DcGan:
             rescale_imgs=self.rescale_imgs,
             generator=self.generator,
             noise_dist=self.noise_dist,
-            noise_length=self.noise_length
+            noise_length=self.noise_length,
         )
         val_loss_total = compute_total_loss(
             loss_target=val_target_loss,
             loss_fake=val_fake_loss,
-            mean=disc_critic_loss_mean
+            mean=disc_critic_loss_mean,
         )
         self.val_losses["epoch"].append(gan_train_epoch)
         self.val_losses["target loss"].append(val_target_loss)
@@ -153,7 +179,15 @@ class DcGan:
 
         return val_loss_total
 
-    def train(self, n_epochs_gan, batch_size, evaluation_interval, n_epochs_critic, disc_critic_loss_mean, rotated_train):
+    def train(
+        self,
+        n_epochs_gan,
+        batch_size,
+        evaluation_interval,
+        n_epochs_critic,
+        disc_critic_loss_mean,
+        rotated_train,
+    ):
         """
         Train the GAN model. This method orchestrates the training process of both the generator and discriminator
         components of the GAN. Training occurs for a specified number of epochs, with evaluations performed at
@@ -174,25 +208,30 @@ class DcGan:
         start_time = datetime.datetime.now()
 
         for epoch in range(n_epochs_gan + 1):
-
             if (epoch % evaluation_interval) == 0:
-
                 # Evaluate current generator.
                 val_loss_total = self._evaluate_generator(
                     gan_train_epoch=epoch,
                     batch_size=batch_size,
                     critic_train_epochs=n_epochs_critic,
-                    disc_critic_loss_mean=disc_critic_loss_mean
+                    disc_critic_loss_mean=disc_critic_loss_mean,
                 )
 
                 # Print evaluation summary.
                 print(
-                    "[End evaluation epoch: %d/%d] [Validation loss: %f] [Time: %s]" % (
-                        epoch, n_epochs_gan, val_loss_total, datetime.datetime.now() - start_time)
+                    "[End evaluation epoch: %d/%d] [Validation loss: %f] [Time: %s]"
+                    % (
+                        epoch,
+                        n_epochs_gan,
+                        val_loss_total,
+                        datetime.datetime.now() - start_time,
+                    )
                 )
 
             # Train discriminator and generator.
-            noise = get_noise(dist=self.noise_dist, n_samples=batch_size, length=self.noise_length)
+            noise = get_noise(
+                dist=self.noise_dist, n_samples=batch_size, length=self.noise_length
+            )
             fake_batch = self.generator.predict(noise)
             if self.rescale_imgs:
                 fake_batch = rescale_pixel_values(fake_batch)
@@ -202,9 +241,11 @@ class DcGan:
                 batch_size=batch_size,
                 one_batch=True,
                 rescale_imgs=self.rescale_imgs,
-                rotated_train=rotated_train
+                rotated_train=rotated_train,
             )["t1"]
-            self.discriminator.train_on_batch(train_target_batch, np.ones((batch_size, 1)))
+            self.discriminator.train_on_batch(
+                train_target_batch, np.ones((batch_size, 1))
+            )
             self.discriminator.train_on_batch(fake_batch, np.zeros((batch_size, 1)))
             self.combined.train_on_batch(noise, np.ones((batch_size, 1)))
 
@@ -212,5 +253,5 @@ class DcGan:
         write_logs_to_file(
             dict_losses=self.val_losses,
             res_dir=f"{self.results_dir}/logs",
-            filename="val_losses"
+            filename="val_losses",
         )
